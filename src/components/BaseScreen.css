@@ -1,0 +1,88 @@
+body {
+	margin: 0;
+	padding: 0
+}
+
+a {
+	text-decoration: none;
+	color: orange;
+  }
+
+.mainContainer {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	margin: 0px;
+	padding: 0px;
+}
+
+div.headerContainer {
+	flex: 0 0 1.25cm;
+	display: flex;
+	flex-direction: row;
+	background-color: #673ab8;
+}
+div.footerContainer {
+	flex: 0 0 1cm;
+	display: flex;
+	text-align: center;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+	background-color: #673ab8;
+	padding: 2px;
+}
+
+.headerContainer a {
+	color: white;
+}
+
+div.headerLogo {
+	width: 2cm;
+	display: flex;
+	font-size: .6cm;
+	align-content: center;
+	justify-content: center;
+}
+div.headerCenter {
+	flex-grow: 1;
+}
+div.headerMenu {
+	/* border: 1pt solid orange; */
+	display: flex;
+	align-content: center;
+	justify-content: center;
+}
+div.headerMenuSelected {
+	background-color: black;
+	font-weight: bold;
+}
+div.headerMenu:hover {
+	background-color: black;
+}
+
+div.contentContainer {
+	margin: 0;
+	flex-grow: 1;
+	overflow: scroll;
+	overflow-y: auto;
+	overflow-x: auto;
+}
+div.contentContainerPadding {
+	padding: 0.5cm;
+}
+
+@media screen and (max-width: 700px) {
+	.hideOnSmallWindows {
+		display: none;
+	}
+	.headerMenu {
+		width: 1cm;
+	}
+}
+@media screen and (min-width: 700px) {
+	.headerMenu {
+		width: 2cm;
+	}
+}
