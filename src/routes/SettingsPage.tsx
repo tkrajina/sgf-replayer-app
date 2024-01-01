@@ -1,10 +1,10 @@
 import { Fragment, h } from 'preact';
 import { TargetedEvent } from 'preact/compat';
 import { useCallback, useState } from 'preact/hooks';
-import { BaseScreen } from '../../components/BaseScreen';
-import { GAMES, SETTINGS, gamesService } from '../../services/GamesService';
+import { BaseScreen } from '../components/BaseScreen';
+import { GAMES, SETTINGS, gamesService } from '../services/GamesService';
 
-export const SettingsPage = (props: {}) => {
+const SettingsPage = (props: {}) => {
 	let [settings, setSettings] = useState(gamesService.loadSettings());
 	let [exportJSON, setExportJSON] = useState(undefined as any);
 
@@ -91,3 +91,5 @@ export const SettingsPage = (props: {}) => {
 		</BaseScreen>
 	);
 };
+
+export default SettingsPage;

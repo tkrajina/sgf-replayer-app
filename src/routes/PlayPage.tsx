@@ -1,17 +1,17 @@
 import { Fragment, h } from 'preact';
-import { BaseScreen } from '../../components/BaseScreen';
+import { BaseScreen } from '../components/BaseScreen';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { parseSGF } from '../../sgf/parser';
-import { SGFGoban } from '../../sgf/goban';
-import { SGFColor, coordinateToRowColumn, rowColumnToCoordinate } from '../../sgf/sgf';
-import { gamesService } from '../../services/GamesService';
+import { parseSGF } from '../sgf/parser';
+import { SGFGoban } from '../sgf/goban';
+import { SGFColor, coordinateToRowColumn, rowColumnToCoordinate } from '../sgf/sgf';
+import { gamesService } from '../services/GamesService';
 import { Link } from 'preact-router';
-import { Game, MilestoneScore } from '../../models';
-import { GameDesc } from '../../components/GameDesc';
+import { Game, MilestoneScore } from '../models';
+import { GameDesc } from '../components/GameDesc';
 
 type GobanWidths = 33 | 66 | 100;
 
-export const PlayPage = (props: {index: string}) => {
+const PlayPage = (props: {index: string}) => {
 	const settings = gamesService.loadSettings();
 
 	const games = gamesService.loadGames();
@@ -170,6 +170,8 @@ export const PlayPage = (props: {index: string}) => {
 		</BaseScreen>
 	);
 };
+
+export default PlayPage;
 
 function GobanSizeSelect(props: {onUpdate: (width: GobanWidths) => void}) {
 	return <Fragment>

@@ -2,8 +2,8 @@ import { Fragment, h } from 'preact';
 import { route } from 'preact-router';
 import { TargetedEvent } from 'preact/compat';
 import { useCallback } from 'preact/hooks';
-import { gamesService } from '../../services/GamesService';
-import { BaseScreen } from '../../components/BaseScreen';
+import { gamesService } from '../services/GamesService';
+import { BaseScreen } from '../components/BaseScreen';
 
 const AddSGF = () => {
 

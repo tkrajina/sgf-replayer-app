@@ -1,5 +1,5 @@
 import { Fragment, h } from 'preact';
-import { BaseScreen } from '../../components/BaseScreen';
+import { BaseScreen } from '../components/BaseScreen';
 
 const Info = () => {
 	return (

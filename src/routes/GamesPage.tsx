@@ -1,12 +1,12 @@
 import { Fragment, h } from 'preact';
 import { Link } from 'preact-router';
 import { useCallback, useEffect, useState } from 'preact/hooks';
-import { BaseScreen } from '../../components/BaseScreen';
-import { Game, MilestoneScore, Settings, getBestMilestoneScore } from '../../models';
-import { gamesService } from '../../services/GamesService';
-import { GameDesc } from '../../components/GameDesc';
+import { BaseScreen } from '../components/BaseScreen';
+import { GameDesc } from '../components/GameDesc';
+import { Game, Settings, getBestMilestoneScore } from '../models';
+import { gamesService } from '../services/GamesService';
 
-export const GamesPage = () => {
+const GamesPage = () => {
 	const [games, setGames] = useState([] as Game[]);
 	const settings = gamesService.loadSettings();
 	const reload = () => {
@@ -36,15 +36,13 @@ export const GamesPage = () => {
 	);
 };
 
+export default GamesPage;
+
 function GameInfo(props: {game: Game, index: number, onDelete: (g: Game) => void, settings: Settings}) {
 	return <Fragment>
 		<Link href={`/play/${props.index}`}>
 			<GameDesc game={props.game} date event result />
 			{(props.settings.millestones||[]).map(milestone => <Milestone game={props.game} milestone={milestone} />)}
-			{/* {props.game?.milestones?.map((m, index) => <Fragment>
-				{index > 0 && <Fragment>&middot;</Fragment>}
-				{m.milestone} moves: {m.percentage}%
-			</Fragment>)} */}
 		</Link>
 		<br/>
 		<button onClick={() => props.onDelete(props.game)}>Delete?</button>
@@ -58,13 +56,3 @@ function Milestone(props: {milestone: number, game: Game}) {
 	}
 	return <small><br/>{props.milestone} moves best score <strong>{scoreCount.score}%</strong> (after {scoreCount.count} tries)</small>
 }
-
-// function Milestones(props: {milestones: MilestoneScore[]}) {
-// 	if (!props.milestones) {
-// 		return null;
-// 	}
-// 	const milestones: number[] = [];
-// 	for (const score of props.milestones) {
-// 		if (milestones.indexOf(score))
-// 	}
-// }

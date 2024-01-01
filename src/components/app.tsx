@@ -1,11 +1,10 @@
 import { Fragment, h } from 'preact';
-import { Route, Router, route } from 'preact-router';
-import Info from '../routes/about';
-import AddSGF from '../routes/add';
-import { useEffect, useState } from 'preact/hooks';
-import { SettingsPage } from '../routes/settings/SettingsPage';
-import { PlayPage } from '../routes/play/PlayPage';
-import { GamesPage } from '../routes/games/GamesPage';
+import { Route, Router } from 'preact-router';
+import GamesPage from '../routes/GamesPage';
+import SettingsPage from '../routes/SettingsPage';
+import Info from '../routes/ApboutPage';
+import AddSGF from '../routes/AddSGFPage';
+import PlayPage from '../routes/PlayPage';
 import { Observable } from '../utils/observable';
 
 export const deferredPrompt = new Observable<Event | undefined>(undefined);
