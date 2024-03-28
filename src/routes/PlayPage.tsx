@@ -12,6 +12,8 @@ import { Goban } from '../components/go/Goban';
 
 type GobanWidths = 33 | 66 | 100;
 
+const TRIES_COUNT = [1, 2, 3, 0, 1];
+
 const PlayPage = (props: {index: string}) => {
 	const settings = gamesService.loadSettings();
 
@@ -26,6 +28,18 @@ const PlayPage = (props: {index: string}) => {
 		gamesService.reloadGame(game, rootNode.current);
 	}, []);
 	let currentNode = useRef(rootNode.current);
+
+	useEffect(() => {
+		game.triesCount = game.triesCount || [];
+		for (const n in game.triesCount) {
+			if (game.triesCount[n] !== undefined) {
+				onNext();
+			}
+		}
+		setTriesCounts(game.triesCount);
+	}, []);
+
+
 	let [moveNo, setMoveNo] = useState(0);
 	let [divWidth, setDivWidth] = useState((settings.gobanWidth || 100) as GobanWidths);
 	let [goban, setGoban] = useState(() => {
@@ -66,6 +80,7 @@ const PlayPage = (props: {index: string}) => {
 		setGoban(newGoban);
 		setMoveNo(path.length - 1);
 	};
+
 	// const onPrevious = () => {
 	// 	const newGoban = new SGFGoban();
 	// 	const path = rootNode.current.findPath(currentNode.current);
@@ -113,6 +128,10 @@ const PlayPage = (props: {index: string}) => {
 			// alert(side + ":" + JSON.stringify(next))
 			setEmptyIntersesections(next);
 		}
+		setInterval(() => {
+			game.triesCount = triesCounts;
+			gamesService.saveGame(gameIndex, game);
+		}, 100);
 	}
 
 	useEffect(() => {

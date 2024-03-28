@@ -20,6 +20,7 @@ export class Game {
 	date: string = "";
 	result: string = "";
 	milestones: MilestoneScore[] = [];
+	triesCount: number[] = [];
 }
 
 export function getBestMilestoneScore(milestone: number, game: Game) {
