@@ -1,5 +1,5 @@
 import { Game, Settings } from "../models";
-import { parseSGFCollection } from "../sgf/parser";
+import { parseSGF, parseSGFCollection } from "../sgf/parser";
 import { SGFNode, Tag } from "../sgf/sgf";
 import { Observable } from "../utils/observable";
 
@@ -39,6 +39,17 @@ class GamesService {
 		if (!games) {
 			return [];
 		}
+		for (const g of games) { // TODO remove later
+			if (!g.movesCount) {
+				let tmpNode = parseSGF(g.sgf);
+				let count = 0;
+				while (tmpNode.children?.length > 0) {
+					tmpNode = tmpNode.children[0];
+					count ++;
+				}
+				g.movesCount = count;
+			}
+		}
 		return games;
 	}
 
@@ -74,6 +85,13 @@ class GamesService {
 		game.event = node.getProperty(Tag.Event)
 		game.date = node.getProperty(Tag.Date)
 		game.result = node.getProperty(Tag.Result)
+		let tmpNode = node;
+		let count = 0;
+		while (tmpNode.children?.length > 0) {
+			tmpNode = tmpNode.children[0];
+			count ++;
+		}
+		game.movesCount = count;
 	}
 }
 

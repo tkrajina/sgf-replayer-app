@@ -5,6 +5,7 @@ import { BaseScreen } from '../components/BaseScreen';
 import { GameDesc } from '../components/GameDesc';
 import { Game, Settings, getBestMilestoneScore } from '../models';
 import { gamesService } from '../services/GamesService';
+import { Heatmap } from '../components/go/Heatmap';
 
 const GamesPage = () => {
 	const [games, setGames] = useState([] as Game[]);
@@ -45,6 +46,7 @@ function GameInfo(props: {game: Game, index: number, onDelete: (g: Game) => void
 			{(props.settings.millestones||[]).map(milestone => <Milestone game={props.game} milestone={milestone} />)}
 		</Link>
 		<br/>
+		<Heatmap moveCount={props.game.movesCount} triesCounts={props.game.currentTriesCount} />
 		<button onClick={() => props.onDelete(props.game)}>Delete?</button>
 	</Fragment>
 }

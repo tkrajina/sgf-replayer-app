@@ -1,18 +1,17 @@
 import { Fragment, h } from 'preact';
-import { BaseScreen } from '../components/BaseScreen';
-import { useEffect, useRef, useState } from 'preact/hooks';
-import { parseSGF } from '../sgf/parser';
-import { SGFGoban } from '../sgf/goban';
-import { SGFColor, coordinateToRowColumn, rowColumnToCoordinate } from '../sgf/sgf';
-import { gamesService } from '../services/GamesService';
 import { Link } from 'preact-router';
-import { Game, MilestoneScore } from '../models';
+import { useEffect, useRef, useState } from 'preact/hooks';
+import { BaseScreen } from '../components/BaseScreen';
 import { GameDesc } from '../components/GameDesc';
 import { Goban } from '../components/go/Goban';
+import { Game, MilestoneScore } from '../models';
+import { gamesService } from '../services/GamesService';
+import { SGFGoban } from '../sgf/goban';
+import { parseSGF } from '../sgf/parser';
+import { coordinateToRowColumn } from '../sgf/sgf';
+import { Heatmap } from '../components/go/Heatmap';
 
 type GobanWidths = 33 | 66 | 100;
-
-const TRIES_COUNT = [1, 2, 3, 0, 1];
 
 const PlayPage = (props: {index: string}) => {
 	const settings = gamesService.loadSettings();
@@ -29,18 +28,17 @@ const PlayPage = (props: {index: string}) => {
 	}, []);
 	let currentNode = useRef(rootNode.current);
 
+	let [moveNo, setMoveNo] = useState(0);
+
 	useEffect(() => {
-		game.triesCount = game.triesCount || [];
-		for (const n in game.triesCount) {
-			if (game.triesCount[n] !== undefined) {
-				onNext();
-			}
+		game.currentTriesCount = game.currentTriesCount || [];
+		for (let i = 0; i <= game.currentMoveNUmber; i++) {
+			onNext();
 		}
-		setTriesCounts(game.triesCount);
+		setTriesCounts(game.currentTriesCount);
 	}, []);
 
 
-	let [moveNo, setMoveNo] = useState(0);
 	let [divWidth, setDivWidth] = useState((settings.gobanWidth || 100) as GobanWidths);
 	let [goban, setGoban] = useState(() => {
 		const res = new SGFGoban()
@@ -129,7 +127,8 @@ const PlayPage = (props: {index: string}) => {
 			setEmptyIntersesections(next);
 		}
 		setInterval(() => {
-			game.triesCount = triesCounts;
+			game.currentTriesCount = triesCounts;
+			game.currentMoveNUmber = moveNo;
 			gamesService.saveGame(gameIndex, game);
 		}, 100);
 	}
@@ -147,16 +146,6 @@ const PlayPage = (props: {index: string}) => {
 			console.log(event.code)
 		}
 		document.addEventListener('keydown', keyListener);
-	}, []);
-	let [moveCount, setMoveCount] = useState(0);
-	useEffect(() => {
-		let tmpNode = rootNode.current;
-		let count = 0;
-		while (tmpNode.children?.length > 0) {
-			tmpNode = tmpNode.children[0];
-			count ++;
-		}
-		setMoveCount(count);
 	}, []);
 
 	const onGobanSizeUpdate = (size: GobanWidths) => {
@@ -182,9 +171,7 @@ const PlayPage = (props: {index: string}) => {
 				{/* <button title={"prev"} onClick={onPrevious}>Prev</button>
 				<button title={"next"} onClick={onNext}>Next</button> */}
 				<br/>
-				<div style={{width: "100%", height: "10px", display: "flex", flexDirection: "row", border: "1px solid gray"}}>
-					{Array.from(Array(moveCount)).map((_, index) => <div style={{flexGrow: 1, backgroundColor: color(triesCounts[index])}}></div>)}
-				</div>
+				<Heatmap moveCount={game.movesCount} triesCounts={triesCounts} />
 				{settings.millestones.map(milestone => <Percentage moveNo={moveNo} milestoneMoves={milestone} triesCounts={triesCounts} onReached={onMilestoneReached} game={game}/>)}
 			</div>
 		</BaseScreen>
@@ -201,20 +188,6 @@ function GobanSizeSelect(props: {onUpdate: (width: GobanWidths) => void}) {
 		&nbsp;
 		<Link href="javascript:void()" onClick={() => props.onUpdate(100)}><img src={`/assets/logo.svg`} alt="Preact Logo" style={{width: "1.2em"}} /></Link>
 	</Fragment>
-}
-
-const retryCountColor = {
-	"0": "#00ff00",
-	"1": "#00cc00",
-	"2": "#009900",
-	"3": "#005500",
-}
-
-function color(retryCount: number) {
-	if (retryCount === undefined) {
-		return null;
-	}
-	return retryCountColor[retryCount] || null;
 }
 
 function Percentage(props: {moveNo: number, triesCounts: number[], milestoneMoves: number, onReached: (milestone: number, percentage: number) => void, game: Game}) {
