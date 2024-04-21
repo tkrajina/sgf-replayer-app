@@ -210,7 +210,7 @@ function GobanSizeSelect(props: {onUpdate: (width: GobanWidths) => void}) {
 function Percentage(props: {moveNo: number, triesCounts: number[], milestoneMoves: number, onReached: (milestone: number, percentage: number) => void, game: Game}) {
 	let sum = 0;
 	for (let i = 0; i < props.milestoneMoves; i++) {
-		if (props.triesCounts[i] !== undefined) {
+		if (props.triesCounts?.[i] !== undefined) {
 			sum += 1 / Math.pow(2, props.triesCounts[i]);
 		}
 	}
