@@ -47,6 +47,7 @@ function GameInfo(props: {game: Game, index: number, onDelete: (g: Game) => void
 		</Link>
 		<br/>
 		<Heatmap moveCount={props.game.movesCount} triesCounts={props.game.currentTriesCount} />
+		<small>{props.game.currentMoveNumber||0}/{props.game.movesCount||"?"}</small>
 		<button onClick={() => props.onDelete(props.game)}>Delete?</button>
 	</Fragment>
 }

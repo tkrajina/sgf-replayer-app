@@ -22,7 +22,7 @@ export class Game {
 	milestones: MilestoneScore[] = [];
 	movesCount = 0;
 	currentTriesCount: number[] = [];
-	currentMoveNUmber = 0;
+	currentMoveNumber = 0;
 }
 
 export function getBestMilestoneScore(milestone: number, game: Game) {

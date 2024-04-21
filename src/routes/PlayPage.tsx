@@ -21,21 +21,24 @@ const PlayPage = (props: {index: string}) => {
 		return <BaseScreen selected='sgfs'><h1>No games found</h1></BaseScreen>;
 	}
 	const gameIndex = parseInt(props.index) || 0;
-	const game = games[gameIndex]; // TODO err echeck
+	const [game, setGame] = useState(games[gameIndex]);
 	let rootNode = useRef(parseSGF(game.sgf));
 	useEffect(() => {
 		gamesService.reloadGame(game, rootNode.current);
 	}, []);
 	let currentNode = useRef(rootNode.current);
 
-	let [moveNo, setMoveNo] = useState(0);
-
 	useEffect(() => {
-		game.currentTriesCount = game.currentTriesCount || [];
-		for (let i = 0; i <= game.currentMoveNUmber; i++) {
-			onNext();
-		}
-		setTriesCounts(game.currentTriesCount);
+		setGame(game => {
+			game.currentTriesCount = game.currentTriesCount || [];
+			const no = game.currentMoveNumber;
+			for (let i = 0; i < no; i++) {
+				console.log(`${i} <= ${game.currentMoveNumber}`);
+				onNext();
+			}
+			gamesService.saveGame(gameIndex, game);
+			return game;
+		})
 	}, []);
 
 
@@ -49,7 +52,6 @@ const PlayPage = (props: {index: string}) => {
 	const tryCount = useRef(0)
 	let [emptyIntersesections, setEmptyIntersesections] = useState([0, 0, 0, 0]);
 	let [invalidIntersections, setInvalidIntersections] = useState([] as number[][]);
-	let [triesCounts, setTriesCounts] = useState([] as number[]);
 
 	const milestonesReached = useRef<{[milestone: string]: boolean}>({});
 	const onMilestoneReached = (milestone: number, percentage: number) => {
@@ -76,8 +78,23 @@ const PlayPage = (props: {index: string}) => {
 			newGoban.apply(n);
 		}
 		setGoban(newGoban);
-		setMoveNo(path.length - 1);
+		setGame(game => {
+			game.currentMoveNumber = path.length - 1;
+			gamesService.saveGame(gameIndex, game);
+			return game;
+		})
 	};
+
+	const onReset = () => {
+		setGame(game => {
+			game.currentMoveNumber = 0;
+			game.currentTriesCount = [];
+			gamesService.saveGame(gameIndex, game);
+			alert("Reset");
+			document.location.reload();
+			return game;
+		})
+	}
 
 	// const onPrevious = () => {
 	// 	const newGoban = new SGFGoban();
@@ -99,10 +116,11 @@ const PlayPage = (props: {index: string}) => {
 		let [color, coords] = next.playerAndCoordinates();
 		let [nextRow, nextCol] = coordinateToRowColumn(coords);
 		if (row == nextRow && col == nextCol) {
-			setTriesCounts(ts => {
-				ts[moveNo] = tryCount.current;
-				return ts;
-			});
+			setGame(game => {
+				game.currentTriesCount[game.currentMoveNumber] = tryCount.current;
+				gamesService.saveGame(gameIndex, game);
+				return game;
+			})
 			tryCount.current = 0;
 			setEmptyIntersesections([0, 0, 0, 0]);
 			setInvalidIntersections([]);
@@ -110,10 +128,11 @@ const PlayPage = (props: {index: string}) => {
 		} else {
 			invalidIntersections.push([row, col]);
 			tryCount.current ++;
-			setTriesCounts(ts => {
-				ts[moveNo] = tryCount.current;
-				return ts;
-			});
+			setGame(game => {
+				game.currentTriesCount[game.currentMoveNumber] = tryCount.current;
+				gamesService.saveGame(gameIndex, game);
+				return game;
+			})
 			const side = goban.size / Math.pow(2, tryCount.current);
 			const top = Math.floor(nextRow / side) * side;
 			const left = Math.floor(nextCol / side) * side;
@@ -126,11 +145,6 @@ const PlayPage = (props: {index: string}) => {
 			// alert(side + ":" + JSON.stringify(next))
 			setEmptyIntersesections(next);
 		}
-		setInterval(() => {
-			game.currentTriesCount = triesCounts;
-			game.currentMoveNUmber = moveNo;
-			gamesService.saveGame(gameIndex, game);
-		}, 100);
 	}
 
 	useEffect(() => {
@@ -162,7 +176,7 @@ const PlayPage = (props: {index: string}) => {
 					<div style={{flexGrow: 1}}>
 						<GameDesc game={game} result />
 						<br/>
-						<small>Move #{moveNo}</small>
+						<small>Move #{game.currentMoveNumber}</small>
 					</div>
 					<div style={{flexGrow: 1, textAlign: "right"}}>
 						<GobanSizeSelect onUpdate={onGobanSizeUpdate} />
@@ -171,8 +185,11 @@ const PlayPage = (props: {index: string}) => {
 				{/* <button title={"prev"} onClick={onPrevious}>Prev</button>
 				<button title={"next"} onClick={onNext}>Next</button> */}
 				<br/>
-				<Heatmap moveCount={game.movesCount} triesCounts={triesCounts} />
-				{settings.millestones.map(milestone => <Percentage moveNo={moveNo} milestoneMoves={milestone} triesCounts={triesCounts} onReached={onMilestoneReached} game={game}/>)}
+				<Heatmap moveCount={game.movesCount} triesCounts={game.currentTriesCount} />
+				{settings.millestones.map(milestone => <Percentage moveNo={game.currentMoveNumber} milestoneMoves={milestone} triesCounts={game.currentTriesCount} onReached={onMilestoneReached} game={game}/>)}
+				{game.currentMoveNumber > 0 && <Fragment>
+					<button onClick={onReset}>Reset</button>
+				</Fragment>}
 			</div>
 		</BaseScreen>
 	);
