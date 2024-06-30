@@ -115,7 +115,7 @@ const PlayPage = (props: {index: string}) => {
 		const next = currentNode.current.children[0];
 		let [color, coords] = next.playerAndCoordinates();
 		let [nextRow, nextCol] = coordinateToRowColumn(coords);
-		if (row == nextRow && col == nextCol) {
+		if ((row == nextRow && col == nextCol) || (tryCount.current >= settings.maxTriesPerMove - 1)) {
 			setGame(game => {
 				game.currentTriesCount[game.currentMoveNumber] = tryCount.current;
 				gamesService.saveGame(gameIndex, game);
@@ -126,7 +126,9 @@ const PlayPage = (props: {index: string}) => {
 			setInvalidIntersections([]);
 			onNext();
 		} else {
-			invalidIntersections.push([row, col]);
+			const distance = Math.sqrt(Math.pow(row - nextRow, 2) + Math.pow(col - nextCol, 2));
+			const d = 1 - distance / goban.size
+			invalidIntersections.push([row, col, d < .3 ? .3 : d]);
 			tryCount.current ++;
 			setGame(game => {
 				game.currentTriesCount[game.currentMoveNumber] = tryCount.current;
@@ -136,14 +138,14 @@ const PlayPage = (props: {index: string}) => {
 			const side = goban.size / Math.pow(2, tryCount.current);
 			const top = Math.floor(nextRow / side) * side;
 			const left = Math.floor(nextCol / side) * side;
-			const next = [
-				top,
-				goban.size - left - side,
-				goban.size - top - side,
-				left
-			]
-			// alert(side + ":" + JSON.stringify(next))
-			setEmptyIntersesections(next);
+			// const next = [
+			// 	top,
+			// 	goban.size - left - side,
+			// 	goban.size - top - side,
+			// 	left
+			// ]
+			// // alert(side + ":" + JSON.stringify(next))
+			// setEmptyIntersesections(next);
 		}
 	}
 

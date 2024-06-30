@@ -112,7 +112,7 @@ export function Goban(props: GobanProps) {
 			)}
 			{!!(tmpStone && nextColor) && <Stone row={tmpStone[0]} column={tmpStone[1]} color={nextColor} bandWidth={bandWidth} unit={unit} opacity={0.25} />}
 			{props.emptyIntersections && <EmptyIntersections bandWidth={bandWidth} margins={props.emptyIntersections} goban={props.goban} unit={props.unit} />}
-			{props.invalidIntersections?.map((coords) => <IntersectionDot row={coords[0]} column={coords[1]} bandWidth={bandWidth} unit={props.unit} radious={bandWidth / 3} opacity={0.25} color="red" />)}
+			{props.invalidIntersections?.map((coords) => <IntersectionDot row={coords[0]} column={coords[1]} bandWidth={bandWidth} unit={props.unit} radious={coords[2] ? bandWidth * coords[2] : (bandWidth / 3)} opacity={0.25} color="gray" />)}
 		</div>
 	</div>
 }
