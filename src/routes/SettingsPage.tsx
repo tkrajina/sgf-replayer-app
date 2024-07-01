@@ -6,7 +6,6 @@ import { GAMES, SETTINGS, gamesService } from '../services/GamesService';
 
 const SettingsPage = (props: {}) => {
 	let [settings, setSettings] = useState(gamesService.loadSettings());
-	let [exportJSON, setExportJSON] = useState(undefined as any);
 
 	const setMillestones = (e: TargetedEvent<HTMLInputElement>) => {
 		const str = e.currentTarget.value;
@@ -36,13 +35,6 @@ const SettingsPage = (props: {}) => {
 		alert("Saved");
 	}
 
-	const onExport = useCallback(() => {
-		const jsn = {};
-		for (const key of [GAMES, SETTINGS]) {
-			jsn[key] = JSON.parse(localStorage.getItem(key));
-		}
-		setExportJSON(jsn);
-	}, []);
 	const uploadFile = useCallback(async (event: TargetedEvent<HTMLInputElement>) => {
 		event.preventDefault();
 		if (window.confirm("Import data. This will overwrite all existing data, continue?")) {
@@ -63,18 +55,6 @@ const SettingsPage = (props: {}) => {
 	return (
 		<BaseScreen selected='settings'>
 			<h1>Settings</h1>
-			<p>
-				{!exportJSON && <Fragment>
-					<button onClick={onExport}>Export / import</button>
-				</Fragment>}
-				{!!exportJSON && <Fragment>
-					<ul>
-						<li> <a download="sgf-replay-expport.json" href={"data:text/plain;charset=utf-8," + encodeURIComponent(JSON.stringify(exportJSON))}>Export all data</a>?</li>
-						<li> Umport all data: <input type="file" accept=".json" name="myFile" onChange={uploadFile} />	</li>
-					</ul>
-					<hr/>
-				</Fragment>}
-			</p>
 			<p>
 				Millestones:<br/>
 				<input type="text" value={(settings.millestones || []).join(",")} onChange={setMillestones} />

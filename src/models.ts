@@ -1,4 +1,8 @@
 export class Settings {
+	id: string;
+	createdAt: number;
+	updatedAt: number;
+
 	millestones: number[] = [20, 50, 100];
 	maxTriesPerMove = 4;
 	maxTimePerMove = 10;
@@ -11,6 +15,10 @@ export class MilestoneScore {
 }
 
 export class Game {
+	id: string;
+	createdAt: number;
+	updatedAt: number;
+
 	sgf: string = "";
 	white: string = "";
 	black: string = "";

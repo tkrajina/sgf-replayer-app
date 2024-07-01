@@ -15,7 +15,7 @@ class StorageAction<T extends Entity> {
 	entity: T;
 }
 
-class Storage<T extends Entity> {
+export class Storage<T extends Entity> {
 
 	actionQueue: {[key: string]: StorageAction<T>} = {};
 
@@ -68,7 +68,7 @@ class Storage<T extends Entity> {
 	}
 }
 
-class SingleEntityStorage<T extends Entity> {
+export class SingleEntityStorage<T extends Entity> {
 
 	static ENTITY_KEY = "entity";
 
