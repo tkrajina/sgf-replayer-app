@@ -16,7 +16,7 @@ export function generateRandomAlphanumeric(length: number, chars?: string): stri
     const charactersLength = chars.length;
 
     for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Date.now() * Math.random() * charactersLength);
+        const randomIndex = Math.floor(Math.random() * charactersLength);
         result += chars.charAt(randomIndex);
     }
 

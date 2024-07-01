@@ -1,4 +1,4 @@
-import { Game, Settings } from "src/models";
+import { Game, Settings } from "../models";
 import { SingleEntityStorage, Storage } from "./StorageService";
 
 export const GAMES_STORAGE = new Storage<Game>("games");

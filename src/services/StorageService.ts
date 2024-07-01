@@ -1,4 +1,4 @@
-import { generateRandomAlphanumeric } from "src/utils/strings";
+import { generateRandomAlphanumeric } from "../utils/strings";
 
 export const GAMES = "sgf_replay_games";
 export const SETTINGS = "sgf_replay_settings";
@@ -32,7 +32,7 @@ export class Storage<T extends Entity> {
 	listAll(): T[] {
 		const res: T[] = [];
 		const all = this.all();
-		for (const id in Object.keys) {
+		for (const id of Object.keys(all)) {
 			res.push(all[id]);
 		}
 		return res;
@@ -48,7 +48,7 @@ export class Storage<T extends Entity> {
 		}
 	}
 
-	update(entity: T) {
+	save(entity: T) {
 		if (!entity?.id) {
 			entity.createdAt = Date.now();
 		}
@@ -86,6 +86,7 @@ export class SingleEntityStorage<T extends Entity> {
 	}
 
 	set(t: T) {
-		this.storage.update(t);
+		t.id = SingleEntityStorage.ENTITY_KEY;
+		this.storage.save(t);
 	}
 }

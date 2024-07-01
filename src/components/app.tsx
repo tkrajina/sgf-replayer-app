@@ -38,7 +38,7 @@ return <Fragment>
 	<Router>
 		<Route path={"/"} component={GamesPage} />
 		<Route path={"/edit"} component={AddSGF} />
-		<Route path={"/play/:index"} component={PlayPage} />
+		<Route path={"/play/:id"} component={PlayPage} />
 		<Route path={"/play"} component={PlayPage} />
 		<Route path={"/settings"} component={SettingsPage} />
 		{/* <Route path={"/stats"} component={Stats} /> */}

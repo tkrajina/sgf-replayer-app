@@ -3,6 +3,7 @@ export class Settings {
 	createdAt: number;
 	updatedAt: number;
 
+	// TODO milestones, typo!
 	millestones: number[] = [20, 50, 100];
 	maxTriesPerMove = 4;
 	maxTimePerMove = 10;

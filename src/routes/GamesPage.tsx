@@ -6,10 +6,11 @@ import { GameDesc } from '../components/GameDesc';
 import { Game, Settings, getBestMilestoneScore } from '../models';
 import { gamesService } from '../services/GamesService';
 import { Heatmap } from '../components/go/Heatmap';
+import { SETTINGS_STORAGE } from '../services/storage';
 
 const GamesPage = () => {
-	const [games, setGames] = useState([] as Game[]);
-	const settings = gamesService.loadSettings();
+	const [games, setGames] = useState(gamesService.loadGames());
+	const settings = SETTINGS_STORAGE.get();
 	const reload = () => {
 		setGames(gamesService.loadGames());
 	}
@@ -41,13 +42,13 @@ export default GamesPage;
 
 function GameInfo(props: {game: Game, index: number, onDelete: (g: Game) => void, settings: Settings}) {
 	return <Fragment>
-		<Link href={`/play/${props.index}`}>
+		<Link href={`/play/${props.game.id}`}>
 			<GameDesc game={props.game} date event result />
-			{(props.settings.millestones||[]).map(milestone => <Milestone game={props.game} milestone={milestone} />)}
+			{(props.settings?.millestones||[]).map(milestone => <Milestone game={props.game} milestone={milestone} />)}
 		</Link>
 		<br/>
-		<Heatmap moveCount={props.game.movesCount} triesCounts={props.game.currentTriesCount} />
-		<small>{props.game.currentMoveNumber||0}/{props.game.movesCount||"?"}</small>
+		<Heatmap moveCount={props.game?.movesCount} triesCounts={props.game.currentTriesCount} />
+		<small>{props.game.currentMoveNumber||0}/{props.game?.movesCount||"?"}</small>
 		<button onClick={() => props.onDelete(props.game)}>Delete?</button>
 	</Fragment>
 }

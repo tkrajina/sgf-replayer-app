@@ -10,18 +10,15 @@ import { SGFGoban } from '../sgf/goban';
 import { parseSGF } from '../sgf/parser';
 import { coordinateToRowColumn } from '../sgf/sgf';
 import { Heatmap } from '../components/go/Heatmap';
+import { GAMES_STORAGE, SETTINGS_STORAGE } from '../services/storage';
 
 type GobanWidths = 33 | 66 | 100;
 
-const PlayPage = (props: {index: string}) => {
-	const settings = gamesService.loadSettings();
+const PlayPage = (props: {id: string}) => {
+	const settings = SETTINGS_STORAGE.get();
 
-	const games = gamesService.loadGames();
-	if (!games?.length) {
-		return <BaseScreen selected='sgfs'><h1>No games found</h1></BaseScreen>;
-	}
-	const gameIndex = parseInt(props.index) || 0;
-	const [game, setGame] = useState(games[gameIndex]);
+	const gameId = props.id;
+	const [game, setGame] = useState(gamesService.loadGame(gameId));
 	let rootNode = useRef(parseSGF(game.sgf));
 	useEffect(() => {
 		gamesService.reloadGame(game, rootNode.current);
@@ -36,7 +33,7 @@ const PlayPage = (props: {index: string}) => {
 				console.log(`${i} <= ${game.currentMoveNumber}`);
 				onNext();
 			}
-			gamesService.saveGame(gameIndex, game);
+			gamesService.saveGame(game);
 			return game;
 		})
 	}, []);
@@ -63,7 +60,7 @@ const PlayPage = (props: {index: string}) => {
 		}
 		milestonesReached.current[milestone] = true;
 		game.milestones.push(new MilestoneScore(milestone, percentage, Date.now()));
-		gamesService.saveGame(gameIndex, game);
+		gamesService.saveGame(game);
 	}
 
 	const onNext = () => {
@@ -80,7 +77,7 @@ const PlayPage = (props: {index: string}) => {
 		setGoban(newGoban);
 		setGame(game => {
 			game.currentMoveNumber = path.length - 1;
-			gamesService.saveGame(gameIndex, game);
+			gamesService.saveGame(game);
 			return game;
 		})
 	};
@@ -89,7 +86,7 @@ const PlayPage = (props: {index: string}) => {
 		setGame(game => {
 			game.currentMoveNumber = 0;
 			game.currentTriesCount = [];
-			gamesService.saveGame(gameIndex, game);
+			gamesService.saveGame(game);
 			alert("Reset");
 			document.location.reload();
 			return game;
@@ -118,7 +115,7 @@ const PlayPage = (props: {index: string}) => {
 		if ((row == nextRow && col == nextCol) || (tryCount.current >= settings.maxTriesPerMove - 1)) {
 			setGame(game => {
 				game.currentTriesCount[game.currentMoveNumber] = tryCount.current;
-				gamesService.saveGame(gameIndex, game);
+				gamesService.saveGame(game);
 				return game;
 			})
 			tryCount.current = 0;
@@ -132,7 +129,7 @@ const PlayPage = (props: {index: string}) => {
 			tryCount.current ++;
 			setGame(game => {
 				game.currentTriesCount[game.currentMoveNumber] = tryCount.current;
-				gamesService.saveGame(gameIndex, game);
+				gamesService.saveGame(game);
 				return game;
 			})
 			const side = goban.size / Math.pow(2, tryCount.current);
@@ -167,7 +164,7 @@ const PlayPage = (props: {index: string}) => {
 	const onGobanSizeUpdate = (size: GobanWidths) => {
 		setDivWidth(size);
 		settings.gobanWidth = size;
-		gamesService.saveSettings(settings);
+		SETTINGS_STORAGE.set(settings);
 	}
 
 	return (
