@@ -6,6 +6,7 @@ import Info from '../routes/ApboutPage';
 import AddSGF from '../routes/AddSGFPage';
 import PlayPage from '../routes/PlayPage';
 import { Observable } from '../utils/observable';
+import LoginPage from '../routes/LoginPage';
 
 export const deferredPrompt = new Observable<Event | undefined>(undefined);
 let type : "browser" | "standalone";
@@ -41,6 +42,7 @@ return <Fragment>
 		<Route path={"/play/:id"} component={PlayPage} />
 		<Route path={"/play"} component={PlayPage} />
 		<Route path={"/settings"} component={SettingsPage} />
+		<Route path={"/login"} component={LoginPage} />
 		{/* <Route path={"/stats"} component={Stats} /> */}
 		<Route path={"/info"} component={Info} />
 		<Route default component={NotFound} />
