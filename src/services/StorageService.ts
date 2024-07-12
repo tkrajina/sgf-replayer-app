@@ -1,9 +1,5 @@
 import { generateRandomAlphanumeric } from "../utils/strings";
 
-export const GAMES = "sgf_replay_games";
-export const SETTINGS = "sgf_replay_settings";
-
-
 interface Entity {
 	id: string;
 	createdAt: number;
@@ -11,9 +7,7 @@ interface Entity {
 }
 
 class StorageAction<T extends Entity> {
-	type: "save" | "delete";
 	id: string;
-	entity: T;
 }
 
 export class Storage<T extends Entity> {
@@ -21,16 +15,16 @@ export class Storage<T extends Entity> {
 	private readonly syncActionQueueKey;
 
 	constructor(private readonly key: string) {
-		this.syncActionQueueKey = `__sync_action_queue_${key}`;
+		this.syncActionQueueKey = `__sync_entity_updated_${key}`;
 	}
 
 	private all(): {[key: string]: T} {
 		return (JSON.parse(localStorage.getItem(this.key)) || {});
 	}
 
-	private saveActionQueue(a: StorageAction<T>) {
+	private markEntityUpdated(a: StorageAction<T>) {
 		const queue = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
-		queue[a.id] = a;
+		queue[a.id] = Date.now();
 		localStorage.setItem(this.syncActionQueueKey, JSON.stringify(queue));
 	}
 
@@ -66,14 +60,14 @@ export class Storage<T extends Entity> {
 		const all = this.all();
 		all[entity.id] = entity;
 		this.saveAll(all);
-		this.saveActionQueue({type: "save", id: entity.id, entity});
+		this.markEntityUpdated(entity);
 	}
 
 	delete(entity: T) {
 		const all = this.all();
 		delete all[entity.id];
 		this.saveAll(all);
-		this.saveActionQueue({type: "delete", id: entity.id, entity});
+		this.markEntityUpdated(entity);
 	}
 }
 
