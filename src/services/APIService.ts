@@ -98,7 +98,7 @@ export class APIService {
         if (response.status === 204 /* no content */) {
           return null;
         }
-        return response.json();
+        return await response.json();
       } else {
         let jsn = null;
         try {

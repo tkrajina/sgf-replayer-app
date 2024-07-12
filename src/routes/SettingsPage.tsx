@@ -1,12 +1,11 @@
 import { Fragment, h } from 'preact';
 import { TargetedEvent } from 'preact/compat';
-import { useCallback, useState } from 'preact/hooks';
+import { useState } from 'preact/hooks';
+import { STORAGE_SERVICE } from '../services/storage';
 import { BaseScreen } from '../components/BaseScreen';
-import { GAMES, SETTINGS, gamesService } from '../services/GamesService';
-import { SETTINGS_STORAGE } from '../services/storage';
 
 const SettingsPage = (props: {}) => {
-	let [settings, setSettings] = useState(SETTINGS_STORAGE.get());
+	let [settings, setSettings] = useState(STORAGE_SERVICE.SETTINGS_STORAGE.get());
 
 	const setMillestones = (e: TargetedEvent<HTMLInputElement>) => {
 		const str = e.currentTarget.value;
@@ -32,7 +31,7 @@ const SettingsPage = (props: {}) => {
 	}
 
 	const onSave = () => {
-		SETTINGS_STORAGE.set(settings);
+		STORAGE_SERVICE.SETTINGS_STORAGE.set(settings);
 		alert("Saved");
 	}
 

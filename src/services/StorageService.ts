@@ -1,13 +1,11 @@
+import { API_SyncAction, API_SyncActionType } from "../models/models_generated";
 import { generateRandomAlphanumeric } from "../utils/strings";
+import { API_SERVICE } from "./APIService";
 
 interface Entity {
 	id: string;
 	createdAt: number;
 	updatedAt: number;
-}
-
-class StorageAction<T extends Entity> {
-	id: string;
 }
 
 export class Storage<T extends Entity> {
@@ -18,13 +16,56 @@ export class Storage<T extends Entity> {
 		this.syncActionQueueKey = `__sync_entity_updated_${key}`;
 	}
 
+	async sync() {
+		try {
+			const updates = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
+			// Empty and save immediately
+			if (!updates?.length) {
+				return;
+			}
+			const all = this.all();
+			const actions: API_SyncAction[] = [];
+			for (const key of Object.keys(updates)) {
+				if (key in all) {
+					actions.push({
+						type: API_SyncActionType.SAVE,
+						key: key,
+						entity: all[key],
+					} as API_SyncAction);
+				} else {
+					actions.push({
+						type: API_SyncActionType.DELETE,
+						key: key,
+					} as API_SyncAction);
+				}
+			}
+
+			// TODO: lock
+			let newEntities = (await API_SERVICE.doPOST(`/entity/${this.key}`, actions)) as T[];
+			if (!newEntities) {
+				newEntities = [];
+			}
+
+			const storage = {};
+			for (const e of newEntities) {
+				storage[e.id] = e;
+			}
+
+			localStorage.setItem(this.syncActionQueueKey, "{}");
+			localStorage.setItem(this.key, JSON.stringify(storage));
+			// TODO: unlock
+		} catch (e) {
+			alert(e); // TODO
+		}
+	}
+
 	private all(): {[key: string]: T} {
 		return (JSON.parse(localStorage.getItem(this.key)) || {});
 	}
 
-	private markEntityUpdated(a: StorageAction<T>) {
+	private markEntityUpdated(e: T) {
 		const queue = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
-		queue[a.id] = Date.now();
+		queue[e.id] = Date.now();
 		localStorage.setItem(this.syncActionQueueKey, JSON.stringify(queue));
 	}
 

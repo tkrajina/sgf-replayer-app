@@ -10,12 +10,12 @@ import { SGFGoban } from '../sgf/goban';
 import { parseSGF } from '../sgf/parser';
 import { coordinateToRowColumn } from '../sgf/sgf';
 import { Heatmap } from '../components/go/Heatmap';
-import { GAMES_STORAGE, SETTINGS_STORAGE } from '../services/storage';
+import { STORAGE_SERVICE } from '../services/storage';
 
 type GobanWidths = 33 | 66 | 100;
 
 const PlayPage = (props: {id: string}) => {
-	const settings = SETTINGS_STORAGE.get();
+	const settings = STORAGE_SERVICE.SETTINGS_STORAGE.get();
 
 	const gameId = props.id;
 	const [game, setGame] = useState(gamesService.loadGame(gameId));
@@ -164,7 +164,7 @@ const PlayPage = (props: {id: string}) => {
 	const onGobanSizeUpdate = (size: GobanWidths) => {
 		setDivWidth(size);
 		settings.gobanWidth = size;
-		SETTINGS_STORAGE.set(settings);
+		STORAGE_SERVICE.SETTINGS_STORAGE.set(settings);
 	}
 
 	return (
