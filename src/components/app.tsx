@@ -7,6 +7,7 @@ import AddSGF from '../routes/AddSGFPage';
 import PlayPage from '../routes/PlayPage';
 import { Observable } from '../utils/observable';
 import LoginPage from '../routes/LoginPage';
+import { useEffect } from 'preact/hooks';
 
 export const deferredPrompt = new Observable<Event | undefined>(undefined);
 let type : "browser" | "standalone";
@@ -35,18 +36,22 @@ export function install() {
 
 const App = () => {
 
-return <Fragment>
-	<Router>
-		<Route path={"/"} component={GamesPage} />
-		<Route path={"/edit"} component={AddSGF} />
-		<Route path={"/play/:id"} component={PlayPage} />
-		<Route path={"/play"} component={PlayPage} />
-		<Route path={"/settings"} component={SettingsPage} />
-		<Route path={"/login"} component={LoginPage} />
-		{/* <Route path={"/stats"} component={Stats} /> */}
-		<Route path={"/info"} component={Info} />
-		<Route default component={NotFound} />
-	</Router>
+	const onchange = () => {
+		alert("sync!")
+	}
+
+	return <Fragment>
+		<Router onChange={onchange}>
+			<Route path={"/"} component={GamesPage} />
+			<Route path={"/edit"} component={AddSGF} />
+			<Route path={"/play/:id"} component={PlayPage} />
+			<Route path={"/play"} component={PlayPage} />
+			<Route path={"/settings"} component={SettingsPage} />
+			<Route path={"/login"} component={LoginPage} />
+			{/* <Route path={"/stats"} component={Stats} /> */}
+			<Route path={"/info"} component={Info} />
+			<Route default component={NotFound} />
+		</Router>
 	</Fragment>;
 }
 
