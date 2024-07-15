@@ -10,9 +10,10 @@ class StorageService {
 	}
 
 	async sync() {
-		for (const storage of Object.values(StorageService)) {
+		for (const storage of Object.values(this)) {
 			// TODO Lock
 			if (storage instanceof Storage) {
+				console.log("Syncing", storage.name());
 				await storage.sync();
 			}
 			if (storage instanceof SingleEntityStorage) {

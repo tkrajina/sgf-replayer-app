@@ -1,5 +1,6 @@
-import { API_URL } from "../global";
 import { Observable } from "../utils/observable";
+
+export const API_URL = `${document.location.protocol}//${document.location.host}/api`;
 
 export class APIError extends Error {
   constructor(public readonly httpCode: number, internalMsg: string, public readonly userMsg: string) {

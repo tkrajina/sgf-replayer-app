@@ -16,23 +16,29 @@ export class Storage<T extends Entity> {
 		this.syncActionQueueKey = `__sync_entity_updated_${key}`;
 	}
 
+	public name() {
+		return this.key;
+	}
+
 	async sync() {
 		try {
 			const updates = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
 			// Empty and save immediately
-			if (!updates?.length) {
+			if (!Object.keys(updates)?.length) {
 				return;
 			}
 			const all = this.all();
 			const actions: API_SyncAction[] = [];
 			for (const key of Object.keys(updates)) {
 				if (key in all) {
+					console.log(`SAVE ${JSON.stringify(all[key])}`);
 					actions.push({
 						type: API_SyncActionType.SAVE,
 						key: key,
 						entity: all[key],
 					} as API_SyncAction);
 				} else {
+					console.log(`DELETE ${JSON.stringify(all[key])}`);
 					actions.push({
 						type: API_SyncActionType.DELETE,
 						key: key,
@@ -41,7 +47,7 @@ export class Storage<T extends Entity> {
 			}
 
 			// TODO: lock
-			let newEntities = (await API_SERVICE.doPOST(`/entity/${this.key}`, actions)) as T[];
+			let newEntities = (await API_SERVICE.doPOST(`/entity/${this.key}`, {actions: actions})) as T[];
 			if (!newEntities) {
 				newEntities = [];
 			}

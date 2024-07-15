@@ -1,13 +1,13 @@
 import { Fragment, h } from 'preact';
 import { Route, Router } from 'preact-router';
-import GamesPage from '../routes/GamesPage';
-import SettingsPage from '../routes/SettingsPage';
-import Info from '../routes/ApboutPage';
 import AddSGF from '../routes/AddSGFPage';
-import PlayPage from '../routes/PlayPage';
-import { Observable } from '../utils/observable';
+import Info from '../routes/ApboutPage';
+import GamesPage from '../routes/GamesPage';
 import LoginPage from '../routes/LoginPage';
-import { useEffect } from 'preact/hooks';
+import PlayPage from '../routes/PlayPage';
+import SettingsPage from '../routes/SettingsPage';
+import { STORAGE_SERVICE } from '../services/storage';
+import { Observable } from '../utils/observable';
 
 export const deferredPrompt = new Observable<Event | undefined>(undefined);
 let type : "browser" | "standalone";
@@ -36,8 +36,13 @@ export function install() {
 
 const App = () => {
 
-	const onchange = () => {
-		alert("sync!")
+	const onchange = async () => {
+		console.log("onchange => sync");
+		try {
+			await STORAGE_SERVICE.sync();
+		} catch (e) {
+			console.error("Sync failed", e);
+		}
 	}
 
 	return <Fragment>
