@@ -21,48 +21,48 @@ export class Storage<T extends Entity> {
 	}
 
 	async sync() {
-		try {
-			const updates = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
-			// Empty and save immediately
-			if (!Object.keys(updates)?.length) {
-				return;
-			}
-			const all = this.all();
-			const actions: API_SyncAction[] = [];
-			for (const key of Object.keys(updates)) {
-				if (key in all) {
-					console.log(`SAVE ${JSON.stringify(all[key])}`);
-					actions.push({
-						type: API_SyncActionType.SAVE,
-						key: key,
-						entity: all[key],
-					} as API_SyncAction);
-				} else {
-					console.log(`DELETE ${JSON.stringify(all[key])}`);
-					actions.push({
-						type: API_SyncActionType.DELETE,
-						key: key,
-					} as API_SyncAction);
-				}
-			}
-
-			// TODO: lock
-			let newEntities = (await API_SERVICE.doPOST(`/entity/${this.key}`, {actions: actions})) as T[];
-			if (!newEntities) {
-				newEntities = [];
-			}
-
-			const storage = {};
-			for (const e of newEntities) {
-				storage[e.id] = e;
-			}
-
-			localStorage.setItem(this.syncActionQueueKey, "{}");
-			localStorage.setItem(this.key, JSON.stringify(storage));
-			// TODO: unlock
-		} catch (e) {
-			alert(e); // TODO
+		const updates = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
+		// Empty and save immediately
+		if (!Object.keys(updates)?.length) {
+			return;
 		}
+		const all = this.all();
+		const actions: API_SyncAction[] = [];
+		for (const key of Object.keys(updates)) {
+			if (key in all) {
+				console.log(`SAVE ${JSON.stringify(all[key])}`);
+				actions.push({
+					type: API_SyncActionType.SAVE,
+					key: key,
+					entity: all[key],
+				} as API_SyncAction);
+			} else {
+				console.log(`DELETE ${JSON.stringify(all[key])}`);
+				actions.push({
+					type: API_SyncActionType.DELETE,
+					key: key,
+				} as API_SyncAction);
+			}
+		}
+
+		await this.retrieve();
+	}
+
+	async retrieve() {
+		// TODO: lock
+		let newEntities = (await API_SERVICE.doGET(`/entities/${this.name()}`)) as T[];
+		if (!newEntities) {
+			newEntities = [];
+		}
+
+		const storage = {};
+		for (const e of newEntities) {
+			storage[e.id] = e;
+		}
+
+		localStorage.setItem(this.syncActionQueueKey, "{}");
+		localStorage.setItem(this.key, JSON.stringify(storage));
+		// TODO: unlock
 	}
 
 	private all(): {[key: string]: T} {

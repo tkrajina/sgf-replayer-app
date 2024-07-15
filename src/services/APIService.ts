@@ -3,6 +3,7 @@ import { Observable } from "../utils/observable";
 export const API_URL = `${document.location.protocol}//${document.location.host}/api`;
 
 export class APIError extends Error {
+
   constructor(public readonly httpCode: number, internalMsg: string, public readonly userMsg: string) {
     super(internalMsg);
   }
@@ -13,9 +14,22 @@ export class APIError extends Error {
 }
 
 export class APIService {
-  // customer = new Observable<API_Customer | undefined>(undefined);
 
-  constructor() {}
+  public loggedIn = new Observable<boolean>(false);
+
+  constructor() {
+    setTimeout(this.checkLoggedIn.bind(this), 500);
+    setInterval(this.checkLoggedIn.bind(this), 30 * 1000);
+  }
+
+  private async checkLoggedIn() {
+    try {
+      const jsn = await API_SERVICE.doGET("/status");
+      this.loggedIn.set(jsn?.logged);
+    } catch (e) {
+      this.loggedIn.set(false);
+    }
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
 
