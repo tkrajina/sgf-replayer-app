@@ -1,11 +1,11 @@
 import { Fragment, h } from 'preact';
 import { TargetedEvent } from 'preact/compat';
 import { useState } from 'preact/hooks';
-import { STORAGE_SERVICE } from '../services/storage';
+import { APPLICATION_SERVICE } from '../services/ApplicationService';
 import { BaseScreen } from '../components/BaseScreen';
 
 const SettingsPage = (props: {}) => {
-	let [settings, setSettings] = useState(STORAGE_SERVICE.SETTINGS_STORAGE.get());
+	let [settings, setSettings] = useState(APPLICATION_SERVICE.SETTINGS_STORAGE.get());
 
 	const setMillestones = (e: TargetedEvent<HTMLInputElement>) => {
 		const str = e.currentTarget.value;
@@ -31,12 +31,13 @@ const SettingsPage = (props: {}) => {
 	}
 
 	const onSave = () => {
-		STORAGE_SERVICE.SETTINGS_STORAGE.set(settings);
+		APPLICATION_SERVICE.SETTINGS_STORAGE.set(settings);
 		alert("Saved");
 	}
 
 	return (
 		<BaseScreen selected='settings'>
+			{JSON.stringify(settings)}
 			<h1>Settings</h1>
 			<p>
 				Millestones:<br/>

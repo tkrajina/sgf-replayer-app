@@ -6,8 +6,9 @@ import GamesPage from '../routes/GamesPage';
 import LoginPage from '../routes/LoginPage';
 import PlayPage from '../routes/PlayPage';
 import SettingsPage from '../routes/SettingsPage';
-import { STORAGE_SERVICE } from '../services/storage';
+import { APPLICATION_SERVICE } from '../services/ApplicationService';
 import { Observable } from '../utils/observable';
+import useObservableListener from '../utils/useObservableListener';
 
 export const deferredPrompt = new Observable<Event | undefined>(undefined);
 let type : "browser" | "standalone";
@@ -35,14 +36,19 @@ export function install() {
 }
 
 const App = () => {
+	const initialized = useObservableListener(APPLICATION_SERVICE.initialized);
 
 	const onchange = async () => {
 		console.log("onchange => sync");
 		try {
-			await STORAGE_SERVICE.sync();
+			await APPLICATION_SERVICE.sync();
 		} catch (e) {
 			console.error("Sync failed", e);
 		}
+	}
+
+	if (!initialized) {
+		return <h1>Loading...</h1>;
 	}
 
 	return <Fragment>

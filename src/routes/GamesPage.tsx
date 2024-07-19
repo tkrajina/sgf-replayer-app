@@ -6,11 +6,11 @@ import { GameDesc } from '../components/GameDesc';
 import { Game, Settings, getBestMilestoneScore } from '../models';
 import { gamesService } from '../services/GamesService';
 import { Heatmap } from '../components/go/Heatmap';
-import { STORAGE_SERVICE } from '../services/storage';
+import { APPLICATION_SERVICE } from '../services/ApplicationService';
 
 const GamesPage = () => {
 	const [games, setGames] = useState(gamesService.loadGames());
-	const settings = STORAGE_SERVICE.SETTINGS_STORAGE.get();
+	const settings = APPLICATION_SERVICE.SETTINGS_STORAGE.get();
 	const reload = () => {
 		setGames(gamesService.loadGames());
 	}

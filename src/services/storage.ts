@@ -1,71 +1,143 @@
-import { Game, Settings } from "../models";
+import { API_SyncAction, API_SyncActionType } from "../models/models_generated";
+import { generateRandomAlphanumeric } from "../utils/strings";
 import { API_SERVICE } from "./APIService";
-import { SingleEntityStorage, Storage } from "./StorageService";
 
-class StorageService {
-	public GAMES_STORAGE = new Storage<Game>("games");
-	public SETTINGS_STORAGE = new SingleEntityStorage<Settings>("settings", new Settings());
+interface Entity {
+	id: string;
+	createdAt: number;
+	updatedAt: number;
+}
 
-	constructor() {
-		API_SERVICE.loggedIn.addListener(async () => {
-			if (API_SERVICE.loggedIn.get()) {
-				console.log("logged in => retrieve");
-				await this.retrieve();
-			}
-		});
+export class Storage<T extends Entity> {
+
+	private readonly syncActionQueueKey;
+
+	constructor(private readonly key: string) {
+		this.syncActionQueueKey = `__sync_entity_updated_${key}`;
 	}
 
-	async retrieve() {
-		if (!API_SERVICE.loggedIn.get()) {
-			console.log("Not logged in => nothing to do");
+	public name() {
+		return this.key;
+	}
+
+	async sync(force = false) {
+		const updates = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
+		// Empty and save immediately
+		if (force) {
+			console.log(`Sync all ${this.key}!`)
+		} else if (!Object.keys(updates)?.length) {
+			console.log(`No updates ${this.key}`);
 			return;
+		} else {
+			console.log(`sync only changed ${this.key}`)
 		}
-		for (const storage of Object.values(this)) {
-			// TODO Lock
-			if (storage instanceof Storage) {
-				console.log("Syncing", storage.name());
-				try {
-					await storage.retrieve();
-				} catch (e) {
-					console.error("Error syncing", storage.name(), e);
-				}
+		const all = this.all();
+		const actions: API_SyncAction[] = [];
+		for (const key of Object.keys(updates)) {
+			if (key in all) {
+				console.log(`SAVE ${JSON.stringify(all[key])}`);
+				actions.push({
+					type: API_SyncActionType.SAVE,
+					key: key,
+					entity: all[key],
+				} as API_SyncAction);
+			} else {
+				console.log(`DELETE ${JSON.stringify(all[key])}`);
+				actions.push({
+					type: API_SyncActionType.DELETE,
+					key: key,
+				} as API_SyncAction);
 			}
-			if (storage instanceof SingleEntityStorage) {
-				try {
-					await storage.storage.retrieve();
-				} catch (e) {
-					console.error("Error syncing", storage.storage.name(), e);
-				}
-			}
-			// TODO Unlock
+		}
+
+		// TODO: lock
+		let newEntities = await API_SERVICE.doPOST(`/entities/${this.name()}/sync`, {actions: actions});
+		if (!newEntities) {
+			newEntities = [];
+		}
+
+		const storage = {};
+		for (const e of newEntities) {
+			storage[e.id] = e;
+		}
+
+		localStorage.setItem(this.syncActionQueueKey, "{}");
+		localStorage.setItem(this.key, JSON.stringify(storage));
+		// TODO: unlock
+	}
+
+	private all(): {[key: string]: T} {
+		return (JSON.parse(localStorage.getItem(this.key)) || {});
+	}
+
+	private markEntityUpdated(e: T) {
+		const queue = JSON.parse(localStorage.getItem(this.syncActionQueueKey) || "{}");
+		queue[e.id] = Date.now();
+		localStorage.setItem(this.syncActionQueueKey, JSON.stringify(queue));
+	}
+
+	private saveAll(all: {[key: string]: T}) {
+		localStorage.setItem(this.key, JSON.stringify(all));
+	}
+
+	listAll(): T[] {
+		const res: T[] = [];
+		const all = this.all();
+		for (const id of Object.keys(all)) {
+			res.push(all[id]);
+		}
+		return res;
+	}
+
+	byId(id: string): T {
+		return this.all()[id];
+	}
+
+	generateIdIfNeeded(entity: T) {
+		if (!entity?.id) {
+			entity.id = generateRandomAlphanumeric(10);
 		}
 	}
 
-	async sync() {
-		if (!API_SERVICE.loggedIn.get()) {
-			console.log("Not logged in => nothing to do");
-			return;
+	save(entity: T) {
+		if (!entity?.id) {
+			entity.createdAt = Date.now();
 		}
-		for (const storage of Object.values(this)) {
-			// TODO Lock
-			if (storage instanceof Storage) {
-				console.log("Syncing", storage.name());
-				try {
-					await storage.sync();
-				} catch (e) {
-					console.error("Error syncing", storage.name(), e);
-				}
-			}
-			if (storage instanceof SingleEntityStorage) {
-				try {
-					await storage.storage.sync();
-				} catch (e) {
-					console.error("Error syncing", storage.storage.name(), e);
-				}
-			}
-			// TODO Unlock
-		}
+		entity.updatedAt = Date.now();
+		this.generateIdIfNeeded(entity);
+		const all = this.all();
+		all[entity.id] = entity;
+		this.saveAll(all);
+		this.markEntityUpdated(entity);
+	}
+
+	delete(entity: T) {
+		const all = this.all();
+		delete all[entity.id];
+		this.saveAll(all);
+		this.markEntityUpdated(entity);
 	}
 }
 
-export const STORAGE_SERVICE = new StorageService();
+export class SingleEntityStorage<T extends Entity> {
+
+	static ENTITY_KEY = "entity";
+
+	storage: Storage<T>;
+
+	constructor(private readonly key: string, initialValue: T) {
+		this.storage = new Storage<T>(this.key);
+		if (!this.storage.byId(SingleEntityStorage.ENTITY_KEY)) {
+			this.set(initialValue);
+		}
+	}
+
+	get(): T {
+		return this.storage.byId(SingleEntityStorage.ENTITY_KEY) as T;
+	}
+
+	set(t: T) {
+		t.id = SingleEntityStorage.ENTITY_KEY;
+		this.storage.save(t);
+	}
+}

@@ -22,13 +22,14 @@ export class APIService {
     setInterval(this.checkLoggedIn.bind(this), 30 * 1000);
   }
 
-  private async checkLoggedIn() {
+  async checkLoggedIn() {
     try {
       const jsn = await API_SERVICE.doGET("/status");
       this.loggedIn.set(jsn?.logged);
     } catch (e) {
       this.loggedIn.set(false);
     }
+    return this.loggedIn.get();
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
