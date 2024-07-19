@@ -9,6 +9,7 @@ class StorageService {
 	constructor() {
 		API_SERVICE.loggedIn.addListener(async () => {
 			if (API_SERVICE.loggedIn.get()) {
+				console.log("logged in => retrieve");
 				await this.retrieve();
 			}
 		});
