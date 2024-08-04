@@ -10,8 +10,8 @@ import { APPLICATION_SERVICE } from '../services/ApplicationService';
 import { Observable } from '../utils/observable';
 import useObservableListener from '../utils/useObservableListener';
 
-export const deferredPrompt = new Observable<Event | undefined>(undefined);
-let type : "browser" | "standalone";
+export const deferredPrompt = new Observable<Event | undefined>(undefined);
+let type: "browser" | "standalone";
 if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true) {
 	console.log('Running in standalone mode');
 	type = "standalone";
@@ -35,8 +35,20 @@ export function install() {
 	}
 }
 
+let visibilityState: DocumentVisibilityState;
+
 const App = () => {
 	const initialized = useObservableListener(APPLICATION_SERVICE.initialized);
+
+	document.addEventListener('visibilitychange', () => {
+		if (visibilityState == document.visibilityState) {
+			return;
+		}
+		visibilityState = document.visibilityState;
+		if (visibilityState == "visible") {
+			onchange();
+		}
+	});
 
 	const onchange = async () => {
 		console.log("onchange => sync");
