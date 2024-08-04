@@ -192,7 +192,7 @@ const PlayPage = (props: {id: string}) => {
 					<button onClick={onReset}>Reset</button>
 					&nbsp;
 				</Fragment>}
-				<a href={"https://ai-sensei.com/upload?sgf=" + encodeURIComponent(game.sgf)}>Open in AI Sensei</a>&nbsp;
+				<a target="_blank" href={"https://ai-sensei.com/upload?sgf=" + encodeURIComponent(game.sgf)}>Open in AI Sensei</a>&nbsp;
 			</div>
 		</BaseScreen>
 	);
