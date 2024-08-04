@@ -1,9 +1,9 @@
 import { Fragment, h } from 'preact';
 import style from "./BaseScreen.css";
-import { Link } from 'preact-router';
 import useObservableListener from '../utils/useObservableListener';
 import { gamesService } from '../services/GamesService';
 import { deferredPrompt, install } from './app';
+import { AppLink } from './AppLink';
 
 type MenuID = "sgfs" | "new" | "rnd" | "stats" | "settings" | "info";
 
@@ -53,18 +53,18 @@ export function BaseScreen(props: { children: any, selected: MenuID, noPadding?:
     <div className={style.mainContainer}>
       <div className={style.headerContainer}>
         <div className={style.headerLogo}>
-          <Link href={"/"} style={{alignSelf: "center", justifySelf: "center"}}><img src={`/assets/logo.svg`} alt="Preact Logo" style={{width: "0.75cm"}} /></Link>
+          <AppLink href={"/"} style={{alignSelf: "center", justifySelf: "center"}}><img src={`/assets/logo.svg`} alt="Preact Logo" style={{width: "0.75cm"}} /></AppLink>
         </div>
         <div className={style.headerCenter}></div>
         {MENU_OPTIONS.map(o => <Fragment>
           <div className={`${style.headerMenu} ${o.id == props.selected ? style.headerMenuSelected : ""}`}>
-            <Link href={o.url} style={{alignSelf: "center", textAlign: "center", fontSize: "0.9em"}}>
+            <AppLink href={o.url} style={{alignSelf: "center", textAlign: "center", fontSize: "0.9em"}}>
               <img src={o.icon} alt={o.txt} style={{filter: "invert(1) sepia(1) saturate(5) hue-rotate(175deg)", width: "0.4cm", height: "0.4cm"}} />
               <span className={style.hideOnSmallWindows}>
                 <br/>
                 {o.txt}
               </span>
-            </Link>
+            </AppLink>
           </div>
         </Fragment>)}
       </div>

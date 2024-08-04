@@ -9,6 +9,7 @@ import SettingsPage from '../routes/SettingsPage';
 import { APPLICATION_SERVICE } from '../services/ApplicationService';
 import { Observable } from '../utils/observable';
 import useObservableListener from '../utils/useObservableListener';
+import { useStateRef } from '../utils/hooks';
 
 export const deferredPrompt = new Observable<Event | undefined>(undefined);
 let type: "browser" | "standalone";
@@ -40,31 +41,25 @@ let visibilityState: DocumentVisibilityState;
 const App = () => {
 	const initialized = useObservableListener(APPLICATION_SERVICE.initialized);
 
-	document.addEventListener('visibilitychange', () => {
+	document.addEventListener('visibilitychange', async () => {
 		if (visibilityState == document.visibilityState) {
 			return;
 		}
-		visibilityState = document.visibilityState;
-		if (visibilityState == "visible") {
-			onchange();
+		if (visibilityState != document.visibilityState) {
+			try {
+				await APPLICATION_SERVICE.sync();
+			} catch (e) {
+				console.error("Sync failed", e);
+			}
 		}
 	});
-
-	const onchange = async () => {
-		console.log("onchange => sync");
-		try {
-			await APPLICATION_SERVICE.sync();
-		} catch (e) {
-			console.error("Sync failed", e);
-		}
-	}
 
 	if (!initialized) {
 		return <h1>Loading...</h1>;
 	}
 
 	return <Fragment>
-		<Router onChange={onchange}>
+		<Router>
 			<Route path={"/"} component={GamesPage} />
 			<Route path={"/edit"} component={AddSGF} />
 			<Route path={"/play/:id"} component={PlayPage} />
