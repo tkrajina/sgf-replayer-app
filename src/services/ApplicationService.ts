@@ -35,7 +35,7 @@ class ApplicationService {
 			return;
 		}
 		const fromLastSyncAll = Date.now() - this.lastSyncAll;
-		const syncAll = fromLastSyncAll > 5 * 60 * 1000;
+		const syncAll = fromLastSyncAll > 4 * 60 * 1000;
 		console.log("Syncing all", syncAll);
 		for (const storage of Object.values(this)) {
 			// TODO Lock

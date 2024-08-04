@@ -2,6 +2,7 @@ import { Fragment, h } from 'preact';
 import { useState } from 'preact/hooks';
 import { BaseScreen } from '../components/BaseScreen';
 import { API_SERVICE } from '../services/APIService';
+import { APPLICATION_SERVICE } from '../services/ApplicationService';
 import { useStateRef } from '../utils/hooks';
 
 const LoginPage = (props: {}) => {
@@ -13,6 +14,7 @@ const LoginPage = (props: {}) => {
 		if (emailSent.get()) {
 			try {
 				await API_SERVICE.doPOST("/login/magiclink/login", {email: email.get(), code: code.get()})
+				await APPLICATION_SERVICE.sync();
 				emailSent.set(true);
 				alert("Logged in");
 			} catch (e) {
