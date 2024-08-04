@@ -83,14 +83,16 @@ const PlayPage = (props: {id: string}) => {
 	};
 
 	const onReset = () => {
-		setGame(game => {
-			game.currentMoveNumber = 0;
-			game.currentTriesCount = [];
-			gamesService.saveGame(game);
-			alert("Reset");
-			document.location.reload();
-			return game;
-		})
+		if (!confirm("Are you sure you want to reset the game?")) {
+			setGame(game => {
+				game.currentMoveNumber = 0;
+				game.currentTriesCount = [];
+				gamesService.saveGame(game);
+				alert("Reset");
+				document.location.reload();
+				return game;
+			})
+		}
 	}
 
 	// const onPrevious = () => {
@@ -188,7 +190,9 @@ const PlayPage = (props: {id: string}) => {
 				{settings.millestones.map(milestone => <Percentage moveNo={game.currentMoveNumber} milestoneMoves={milestone} triesCounts={game.currentTriesCount} onReached={onMilestoneReached} game={game}/>)}
 				{game.currentMoveNumber > 0 && <Fragment>
 					<button onClick={onReset}>Reset</button>
+					&nbsp;
 				</Fragment>}
+				<a href={"https://ai-sensei.com/upload?sgf=" + encodeURIComponent(game.sgf)}>Open in AI Sensei</a>&nbsp;
 			</div>
 		</BaseScreen>
 	);
