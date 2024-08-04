@@ -3,6 +3,7 @@ import { TargetedEvent } from 'preact/compat';
 import { useState } from 'preact/hooks';
 import { APPLICATION_SERVICE } from '../services/ApplicationService';
 import { BaseScreen } from '../components/BaseScreen';
+import { Link } from 'preact-router';
 
 const SettingsPage = (props: {}) => {
 	let [settings, setSettings] = useState(APPLICATION_SERVICE.SETTINGS_STORAGE.get());
@@ -37,8 +38,10 @@ const SettingsPage = (props: {}) => {
 
 	return (
 		<BaseScreen selected='settings'>
-			{JSON.stringify(settings)}
 			<h1>Settings</h1>
+			<p>
+				<Link href="/login">Login</Link>
+			</p>
 			<p>
 				Millestones:<br/>
 				<input type="text" value={(settings.millestones || []).join(",")} onChange={setMillestones} />
