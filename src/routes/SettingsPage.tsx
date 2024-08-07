@@ -10,11 +10,6 @@ const SettingsPage = (props: {}) => {
 
 	const setMillestones = (e: TargetedEvent<HTMLInputElement>) => {
 		const str = e.currentTarget.value;
-		const milestones = (str || "").split(",").map(txt => parseInt(txt.trim())).filter(e => !isNaN(e)).map(Math.abs);
-		setSettings(s => {
-			s.millestones = milestones;
-			return s;
-		});
 	}
 
 	const setMaxTimePerMove = (e: TargetedEvent<HTMLInputElement>) => {
@@ -41,10 +36,6 @@ const SettingsPage = (props: {}) => {
 			<h1>Settings</h1>
 			<p>
 				<Link href="/login">Login</Link>
-			</p>
-			<p>
-				Millestones:<br/>
-				<input type="text" value={(settings.millestones || []).join(",")} onChange={setMillestones} />
 			</p>
 			<p>
 				Max tries per move:<br/>

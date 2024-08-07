@@ -44,7 +44,6 @@ function GameInfo(props: {game: Game, index: number, onDelete: (g: Game) => void
 	return <Fragment>
 		<Link href={`/play/${props.game.id}`}>
 			<GameDesc game={props.game} date event result />
-			{(props.settings?.millestones||[]).map(milestone => <Milestone game={props.game} milestone={milestone} />)}
 		</Link>
 		<br/>
 		<Heatmap moveCount={props.game?.movesCount} triesCounts={props.game.currentTriesCount} />

@@ -187,7 +187,6 @@ const PlayPage = (props: {id: string}) => {
 				<button title={"next"} onClick={onNext}>Next</button> */}
 				<br/>
 				<Heatmap moveCount={game.movesCount} triesCounts={game.currentTriesCount} />
-				{settings.millestones.map(milestone => <Percentage moveNo={game.currentMoveNumber} milestoneMoves={milestone} triesCounts={game.currentTriesCount} onReached={onMilestoneReached} game={game}/>)}
 				{game.currentMoveNumber > 0 && <Fragment>
 					<button onClick={onReset}>Reset</button>
 					&nbsp;
@@ -208,29 +207,4 @@ function GobanSizeSelect(props: {onUpdate: (width: GobanWidths) => void}) {
 		&nbsp;
 		<Link href="javascript:void()" onClick={() => props.onUpdate(100)}><img src={`/assets/logo.svg`} alt="Preact Logo" style={{width: "1.2em"}} /></Link>
 	</Fragment>
-}
-
-function Percentage(props: {moveNo: number, triesCounts: number[], milestoneMoves: number, onReached: (milestone: number, percentage: number) => void, game: Game}) {
-	let sum = 0;
-	for (let i = 0; i < props.milestoneMoves; i++) {
-		if (props.triesCounts?.[i] !== undefined) {
-			sum += 1 / Math.pow(2, props.triesCounts[i]);
-		}
-	}
-	let percentage = Math.round(100 * sum / props.milestoneMoves);
-	if (props.moveNo == props.milestoneMoves + 1) {
-		props.onReached(props.milestoneMoves, percentage);
-	}
-	const milestoneReached = props.moveNo >= props.milestoneMoves
-	if (milestoneReached) {
-		// All fine:
-	} else if (props.moveNo > .25 * props.milestoneMoves) {
-		percentage = Math.round(percentage / (props.moveNo / props.milestoneMoves));
-	} else {
-		percentage = undefined;
-	}
-	const best = (props.game.milestones || []).filter(e => e.milestone == props.milestoneMoves).map(e => e.percentage).sort().reverse()?.[0];
-	return <span style={{fontWeight: milestoneReached ? "bold" : undefined}}>First {props.milestoneMoves} score: {/*{sum}/{props.moves}*/} {props.moveNo < props.milestoneMoves ? "~" : ""}{percentage ? percentage + "%" : "..."}
-	{best && <small> &nbsp; &middot; (best score: {best}%)</small>}
-	<br/></span>;
 }
