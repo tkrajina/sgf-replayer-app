@@ -41,7 +41,7 @@ const GamesPage = () => {
 export default GamesPage;
 
 function GameInfo(props: {game: Game, index: number, onDelete: (g: Game) => void, settings: Settings}) {
-	return <Fragment>
+	return <Fragment key={props.game?.id}>
 		<Link href={`/play/${props.game.id}`}>
 			<GameDesc game={props.game} date event result />
 		</Link>
